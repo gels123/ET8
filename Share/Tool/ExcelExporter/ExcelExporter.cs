@@ -61,7 +61,7 @@ namespace ET
 
         private const string CSClassDir = "../Unity/Assets/Scripts/Model/Generate/ClientServer/Config";
 
-        private const string excelDir = "../Unity/Assets/Config/Excel/";
+        private const string excelDir = "../Docs/Config/Excel";
 
         private const string jsonDir = "../Config/Json/{0}/{1}";
 
@@ -86,6 +86,7 @@ namespace ET
 
         public static ExcelPackage GetPackage(string filePath)
         {
+            // Log.Console("GetPackage filePath=" + filePath);
             if (!packages.TryGetValue(filePath, out var package))
             {
                 using Stream stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
@@ -100,7 +101,10 @@ namespace ET
         {
             try
             {
-                template = File.ReadAllText("Template.txt");
+                string curPath = Environment.CurrentDirectory;
+                string templatePath = Path.Join(curPath, "../Share/Tool/Template.txt");
+                template = File.ReadAllText(templatePath);
+                Log.Console("Excel Exporter curPath="+ curPath +" templatePath=" + templatePath);
                 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
                 if (Directory.Exists(ClientClassDir))
@@ -134,7 +138,7 @@ namespace ET
                 foreach (string path in files)
                 {
                     string fileName = Path.GetFileName(path);
-                    if (!fileName.EndsWith(".xlsx") || fileName.StartsWith("~$") || fileName.Contains("#"))
+                    if (!fileName.EndsWith(".xlsx") || fileName.StartsWith(".") || fileName.StartsWith("~") || fileName.StartsWith("~$") || fileName.Contains("~") || fileName.Contains("#") || fileName.Contains("$"))
                     {
                         continue;
                     }
@@ -196,7 +200,6 @@ namespace ET
                 configAssemblies[(int) ConfigType.cs] = DynamicBuild(ConfigType.cs);
 
                 List<string> excels = FileHelper.GetAllFiles(excelDir, "*.xlsx");
-                
                 foreach (string path in excels)
                 {
                     ExportExcel(path);
@@ -231,10 +234,11 @@ namespace ET
             string dir = Path.GetDirectoryName(path);
             string relativePath = Path.GetRelativePath(excelDir, dir);
             string fileName = Path.GetFileName(path);
-            if (!fileName.EndsWith(".xlsx") || fileName.StartsWith("~$") || fileName.Contains("#"))
+            if (!fileName.EndsWith(".xlsx") || fileName.StartsWith("~$") || fileName.Contains("#") || fileName.Contains("~") || fileName.Contains("$"))
             {
                 return;
             }
+            Log.Console("ExportExcel fileName=" + fileName);
 
             string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
             string fileNameWithoutCS = fileNameWithoutExtension;

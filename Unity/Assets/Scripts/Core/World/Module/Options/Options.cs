@@ -6,16 +6,16 @@ namespace ET
 {
     public enum AppType
     {
-        Server,
-        Watcher, // 每台物理机一个守护进程，用来启动该物理机上的所有进程
-        GameTool,
-        ExcelExporter,
-        Proto2CS,
-        BenchmarkClient,
-        BenchmarkServer,
+        Server = 1,
+        Watcher = 2, // 每台物理机一个守护进程，用来启动该物理机上的所有进程
+        GameTool = 3,
         
-        Demo,
-        LockStep,
+        ExcelExporter = 11,
+        Proto2CS = 12,
+        BenchmarkClient = 13,
+        BenchmarkServer = 14,
+        Demo = 15,
+        LockStep = 16,
     }
     
     public class Options: Singleton<Options>
