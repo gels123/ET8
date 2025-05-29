@@ -61,6 +61,7 @@ namespace ET
 
         private static void ProtoFile2CS(string fileName, string protoName, string cs, int startOpcode)
         {
+            Log.Console("ProtoFile2CS fileName = " + fileName + ".proto");
             msgOpcode.Clear();
 
             string proto = Path.Combine(protoDir, $"{fileName}.proto");
