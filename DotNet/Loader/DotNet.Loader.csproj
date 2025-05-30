@@ -22,10 +22,7 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <Optimize>true</Optimize>
-    </PropertyGroup>
-    <ItemGroup>
-        
-    </ItemGroup> 
+    </PropertyGroup> 
     <ItemGroup> 
         <ProjectReference Include="..\..\Share\Analyzer\Share.Analyzer.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
         <ProjectReference Include="..\..\Share\Share.SourceGenerator\Share.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
