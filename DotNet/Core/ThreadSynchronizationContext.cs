@@ -19,7 +19,6 @@ namespace ET
                 {
                     return;
                 }
-
                 try
                 {
                     a();

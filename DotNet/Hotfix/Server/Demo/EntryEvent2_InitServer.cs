@@ -14,18 +14,17 @@ namespace ET.Server
                 {
                     int process = root.Fiber.Process;
                     StartProcessConfig startProcessConfig = StartProcessConfigCategory.Instance.Get(process);
-                    if (startProcessConfig.Port != 0)
+                    if (startProcessConfig.Port > 0)
                     {
                         await FiberManager.Instance.Create(SchedulerType.ThreadPool, ConstFiberId.NetInner, 0, SceneType.NetInner, "NetInner");
                     }
 
                     // 根据配置创建纤程
                     var processScenes = StartSceneConfigCategory.Instance.GetByProcess(process);
-                    foreach (StartSceneConfig startConfig in processScenes)
+                    foreach (StartSceneConfig sceneConfig in processScenes)
                     {
-                        await FiberManager.Instance.Create(SchedulerType.ThreadPool, startConfig.Id, startConfig.Zone, startConfig.Type, startConfig.Name);
+                        await FiberManager.Instance.Create(SchedulerType.ThreadPool, sceneConfig.Id, sceneConfig.Zone, sceneConfig.Type, sceneConfig.Name);
                     }
-
                     break;
                 }
                 case AppType.Watcher:

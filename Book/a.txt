@@ -1,0 +1,114 @@
+1个scene=一个服务 => 1个纤程 => 
+
+using System;
+using System.Collections.Generic;
+using System.Threading;
+
+public class TaskQueueSystem
+{
+    private class WorkerThread
+    {
+        private readonly Thread _thread;
+        private readonly Queue<Action> _taskQueue = new Queue<Action>();
+        private readonly object _lockObj = new object();
+        private readonly ManualResetEvent _workEvent = new ManualResetEvent(false);
+        private bool _shouldStop = false;
+
+        public WorkerThread()
+        {
+            _thread = new Thread(ProcessTasks);
+            _thread.Start();
+        }
+
+        public void AddTask(Action task)
+        {
+            lock (_lockObj)
+            {
+                _taskQueue.Enqueue(task);
+                _workEvent.Set(); // 唤醒线程
+            }
+        }
+
+        public void Stop()
+        {
+            _shouldStop = true;
+            _workEvent.Set(); // 确保线程能退出
+            _thread.Join();
+        }
+
+        private void ProcessTasks()
+        {
+            while (!_shouldStop)
+            {
+                Action task = null;
+                lock (_lockObj)
+                {
+                    if (_taskQueue.Count > 0)
+                    {
+                        task = _taskQueue.Dequeue();
+                    }
+                    else
+                    {
+                        _workEvent.Reset(); // 准备休眠
+                    }
+                }
+
+                if (task != null)
+                {
+                    task.Invoke();
+                }
+                else
+                {
+                    _workEvent.WaitOne(); // 等待新任务
+                }
+            }
+        }
+    }
+
+    private readonly WorkerThread[] _workers;
+
+    public TaskQueueSystem(int threadCount)
+    {
+        _workers = new WorkerThread[threadCount];
+        for (int i = 0; i < threadCount; i++)
+        {
+            _workers[i] = new WorkerThread();
+        }
+    }
+
+    public void AddTask(int threadIndex, Action task)
+    {
+        _workers[threadIndex].AddTask(task);
+    }
+
+    public void StopAll()
+    {
+        foreach (var worker in _workers)
+        {
+            worker.Stop();
+        }
+    }
+}
+
+// 使用示例
+class Program
+{
+    static void Main()
+    {
+        var system = new TaskQueueSystem(8); // 创建8个线程
+        
+        // 添加任务到随机线程
+        Random rnd = new Random();
+        for (int i = 0; i < 100; i++)
+        {
+            int threadIndex = rnd.Next(8);
+            system.AddTask(threadIndex, () => {
+                Console.WriteLine($"Task executed by thread {Thread.CurrentThread.ManagedThreadId}");
+                Thread.Sleep(100); // 模拟任务执行
+            });
+        }
+
+        Thread.Sleep(2000); // 等待所有任务完成
+        system.StopAll();
+    }
+}

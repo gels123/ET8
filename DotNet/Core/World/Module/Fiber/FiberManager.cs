@@ -8,9 +8,9 @@ namespace ET
 {
     public enum SchedulerType
     {
-        Main,
-        Thread,
-        ThreadPool,
+        Main,       // 主线程
+        Thread,     // 单线程
+        ThreadPool, // 线程池
     }
     
     public class FiberManager: Singleton<FiberManager>, ISingletonAwake, ISingletonReverseDispose

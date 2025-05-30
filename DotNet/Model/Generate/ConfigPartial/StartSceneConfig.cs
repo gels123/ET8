@@ -36,38 +36,38 @@ namespace ET
 
         public override void EndInit()
         {
-            foreach (StartSceneConfig startSceneConfig in this.GetAll().Values)
+            foreach (StartSceneConfig sceneConfig in this.GetAll().Values)
             {
-                this.ProcessScenes.Add(startSceneConfig.Process, startSceneConfig);
+                this.ProcessScenes.Add(sceneConfig.Process, sceneConfig);
                 
-                if (!this.ClientScenesByName.ContainsKey(startSceneConfig.Zone))
+                if (!this.ClientScenesByName.ContainsKey(sceneConfig.Zone))
                 {
-                    this.ClientScenesByName.Add(startSceneConfig.Zone, new Dictionary<string, StartSceneConfig>());
+                    this.ClientScenesByName.Add(sceneConfig.Zone, new Dictionary<string, StartSceneConfig>());
                 }
-                this.ClientScenesByName[startSceneConfig.Zone].Add(startSceneConfig.Name, startSceneConfig);
+                this.ClientScenesByName[sceneConfig.Zone].Add(sceneConfig.Name, sceneConfig);
                 
-                switch (startSceneConfig.Type)
+                switch (sceneConfig.Type)
                 {
                     case SceneType.Realm:
-                        this.Realms.Add(startSceneConfig);
+                        this.Realms.Add(sceneConfig);
                         break;
                     case SceneType.Gate:
-                        this.Gates.Add(startSceneConfig.Zone, startSceneConfig);
+                        this.Gates.Add(sceneConfig.Zone, sceneConfig);
                         break;
                     case SceneType.Location:
-                        this.LocationConfig = startSceneConfig;
+                        this.LocationConfig = sceneConfig;
                         break;
                     case SceneType.Router:
-                        this.Routers.Add(startSceneConfig);
+                        this.Routers.Add(sceneConfig);
                         break;
                     case SceneType.Map:
-                        this.Maps.Add(startSceneConfig);
+                        this.Maps.Add(sceneConfig);
                         break;
                     case SceneType.Match:
-                        this.Match = startSceneConfig;
+                        this.Match = sceneConfig;
                         break;
                     case SceneType.BenchmarkServer:
-                        this.Benchmark = startSceneConfig;
+                        this.Benchmark = sceneConfig;
                         break;
                 }
             }
