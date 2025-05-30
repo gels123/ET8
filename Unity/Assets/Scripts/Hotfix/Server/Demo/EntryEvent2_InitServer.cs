@@ -35,6 +35,7 @@ namespace ET.Server
                 }
                 case AppType.GameTool:
                 {
+                    Log.Info("EntryEvent2_InitServer ignore, AppType=GameTool");
                     break;
                 }
             }
