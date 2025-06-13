@@ -6,9 +6,9 @@ namespace ET
 	public enum SceneType: long
 	{
 		None = 0,
-		Main = 1, // 主纤程,一个进程一个, 初始化从这里开始
-		NetInner = 1 << 2, // 负责进程间消息通信
-		Realm = 1 << 3,
+		Main = 1, // 主纤程(service), 一个进程一个, 初始化从这里开始
+		NetInner = 1 << 2, // 网络纤程(service), 负责进程间消息通信
+		Realm = 1 << 3, // 登录纤程(service)
 		Gate = 1 << 4,
 		Http = 1 << 5,
 		Location = 1 << 6,

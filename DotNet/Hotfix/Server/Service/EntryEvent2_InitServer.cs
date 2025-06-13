@@ -14,13 +14,14 @@ namespace ET.Server
                 {
                     Log.Info("EntryEvent2_InitServer AppType=Server");
                     int process = root.Fiber.Process;
+                    // 创建网络纤程
                     StartProcessConfig startProcessConfig = StartProcessConfigCategory.Instance.Get(process);
                     if (startProcessConfig.Port > 0)
                     {
                         await FiberManager.Instance.Create(SchedulerType.ThreadPool, ConstFiberId.NetInner, 0, SceneType.NetInner, "NetInner");
                     }
 
-                    // 根据配置创建纤程
+                    // 创建业务纤程
                     var processScenes = StartSceneConfigCategory.Instance.GetByProcess(process);
                     foreach (StartSceneConfig sceneConfig in processScenes)
                     {
