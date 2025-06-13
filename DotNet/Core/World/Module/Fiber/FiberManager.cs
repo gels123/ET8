@@ -65,6 +65,7 @@ namespace ET
         {
             try
             {
+                Log.Info($"FiberManager.Create schedulerType={schedulerType} fiberId={fiberId} zone={zone} sceneType={sceneType} name={name}");
                 Fiber fiber = new(fiberId, zone, sceneType, name);
 
                 if (!this.fibers.TryAdd(fiberId, fiber))

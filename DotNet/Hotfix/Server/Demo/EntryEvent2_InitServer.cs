@@ -12,6 +12,7 @@ namespace ET.Server
             {
                 case AppType.Server:
                 {
+                    Log.Info("EntryEvent2_InitServer AppType=Server");
                     int process = root.Fiber.Process;
                     StartProcessConfig startProcessConfig = StartProcessConfigCategory.Instance.Get(process);
                     if (startProcessConfig.Port > 0)
@@ -29,6 +30,7 @@ namespace ET.Server
                 }
                 case AppType.Watcher:
                 {
+                    Log.Info("EntryEvent2_InitServer AppType=Watcher");
                     root.AddComponent<WatcherComponent>();
                     break;
                 }
@@ -38,7 +40,7 @@ namespace ET.Server
                     break;
                 }
             }
-
+            
             if (Options.Instance.Console == 1)
             {
                 root.AddComponent<ConsoleComponent>();

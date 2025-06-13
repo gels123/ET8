@@ -17,7 +17,7 @@ namespace ET
         {
             this.fiberManager = fiberManager;
             int threadCount = Environment.ProcessorCount;
-            Log.Info("ThreadPoolScheduler threadCount=" + threadCount);
+            Log.Info("ThreadPoolScheduler Create threadCount=" + threadCount);
             this.threads = new List<Thread>(threadCount);
             for (int i = 0; i < threadCount; ++i)
             {
