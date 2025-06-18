@@ -48,6 +48,7 @@ namespace ET
             
             await World.Instance.AddSingleton<ConfigLoader>().LoadAsync();
 
+            // 创建主纤程
             await FiberManager.Instance.Create(SchedulerType.Main, ConstFiberId.Main, 0, SceneType.Main, "");
         }
     }

@@ -58,7 +58,6 @@ namespace ET
                 {
                     continue;
                 }
-
                 if (fiber.IsDisposed)
                 {
                     continue;

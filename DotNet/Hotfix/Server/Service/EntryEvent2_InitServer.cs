@@ -20,7 +20,6 @@ namespace ET.Server
                     {
                         await FiberManager.Instance.Create(SchedulerType.ThreadPool, ConstFiberId.NetInner, 0, SceneType.NetInner, "NetInner");
                     }
-
                     // 创建业务纤程
                     var processScenes = StartSceneConfigCategory.Instance.GetByProcess(process);
                     foreach (StartSceneConfig sceneConfig in processScenes)
