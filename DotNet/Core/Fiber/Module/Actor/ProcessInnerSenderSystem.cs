@@ -11,15 +11,11 @@ namespace ET
         [EntitySystem]
         private static void Destroy(this ProcessInnerSender self)
         {
-            Fiber fiber = self.Fiber();
-            MessageQueue.Instance.RemoveQueue(fiber.Id);
         }
 
         [EntitySystem]
         private static void Awake(this ProcessInnerSender self)
         {
-            Fiber fiber = self.Fiber();
-            MessageQueue.Instance.AddQueue(fiber.Id);
         }
 
         [EntitySystem]
@@ -27,7 +23,7 @@ namespace ET
         {
             self.list.Clear();
             Fiber fiber = self.Fiber();
-            MessageQueue.Instance.Fetch(fiber.Id, 1000, self.list);
+            MessageQueue.Instance.Fetch(fiber, 1000, self.list);
 
             foreach (MessageInfo actorMessageInfo in self.list)
             {

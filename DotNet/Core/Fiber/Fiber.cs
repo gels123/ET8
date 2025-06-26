@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 
@@ -50,14 +51,18 @@ namespace ET
         public ILog Log { get; }
 
         private readonly Queue<ETTask> frameFinishTasks = new();
+
+        public IScheduler scheduler = null;
+        public ConcurrentQueue<MessageInfo> msgs = new();
         
-        internal Fiber(int id, int zone, SceneType sceneType, string name)
+        internal Fiber(int id, int zone, SceneType sceneType, string name, IScheduler scheduler)
         {
             this.Id = id;
             this.Zone = zone;
             this.EntitySystem = new EntitySystem();
             this.Mailboxes = new Mailboxes();
-            this.ThreadSynchronizationContext = new ThreadSynchronizationContext();
+            this.ThreadSynchronizationContext = new ThreadSynchronizationContext(this);
+            this.scheduler = scheduler;
 #if UNITY
             this.Log = Logger.Instance.Log;
 #else
@@ -118,6 +123,17 @@ namespace ET
             this.IsDisposed = true;
             
             this.Root.Dispose();
+        }
+
+        public bool HasTask()
+        {
+            return this.msgs.Count > 0 || this.ThreadSynchronizationContext.HasTask();
+        }
+
+        public bool Send(Address from, ActorId actorId, MessageObject messageObject)
+        {
+            this.msgs.Enqueue(new MessageInfo() {ActorId = new ActorId(from, actorId.InstanceId), MessageObject = messageObject});
+            return true;
         }
     }
 }

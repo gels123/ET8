@@ -65,17 +65,16 @@ namespace ET
         {
             try
             {
-                Log.Info($"FiberManager.Create schedulerType={schedulerType} fiberId={fiberId} zone={zone} sceneType={sceneType} name={name}");
-                Fiber fiber = new(fiberId, zone, sceneType, name);
+                Log.Info($"FiberManager.Create begin schedulerType={schedulerType} fiberId={fiberId} zone={zone} sceneType={sceneType} name={name}");
+                var scheduler = this.schedulers[(int)schedulerType];
+                Fiber fiber = new(fiberId, zone, sceneType, name, scheduler);
 
                 if (!this.fibers.TryAdd(fiberId, fiber))
                 {
                     throw new Exception($"same fiber already existed, if you remove, please await Remove then Create fiber! {fiberId}");
                 }
-                this.schedulers[(int) schedulerType].Add(fiberId);
                 
                 TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
-
                 fiber.ThreadSynchronizationContext.Post(async () =>
                 {
                     try
@@ -90,6 +89,7 @@ namespace ET
                     }
                 });
 
+                Log.Info($"FiberManager.Create end schedulerType={schedulerType} fiberId={fiberId} zone={zone} sceneType={sceneType} name={name}");
                 await tcs.Task;
                 return fiberId;
             }

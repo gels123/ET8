@@ -8,8 +8,11 @@ namespace ET
     internal class ThreadPoolScheduler: IScheduler
     {
         private readonly List<Thread> threads;
+        
+        private readonly ManualResetEvent workEvent = new ManualResetEvent(false);
 
         private readonly ConcurrentQueue<int> idQueue = new();
+        private readonly ConcurrentDictionary<int, int> idDict = new();
         
         private readonly FiberManager fiberManager;
 
@@ -39,7 +42,6 @@ namespace ET
                     // count最小为1
                     count = this.fiberManager.Count() / this.threads.Count + 1;
                 }
-
                 --count;
                 
                 if (this.fiberManager.IsDisposed())
@@ -47,18 +49,17 @@ namespace ET
                     return;
                 }
                 
-                if (!this.idQueue.TryDequeue(out int id))
+                if (!this.idQueue.TryDequeue(out int fiberId))
                 {
-                    Thread.Sleep(1);
+                    this.workEvent.Reset(); // 准备休眠
+                    this.workEvent.WaitOne(); // 等待新任务
+                    // Log.Debug($"ThreadPoolScheduler.Loop wait threadId={System.Environment.CurrentManagedThreadId}");
                     continue;
                 }
+                this.idDict.TryRemove(fiberId, out _);
 
-                Fiber fiber = this.fiberManager.Get(id);
-                if (fiber == null)
-                {
-                    continue;
-                }
-                if (fiber.IsDisposed)
+                Fiber fiber = this.fiberManager.Get(fiberId);
+                if (fiber == null || fiber.IsDisposed)
                 {
                     continue;
                 }
@@ -70,7 +71,11 @@ namespace ET
                 SynchronizationContext.SetSynchronizationContext(null);
                 Fiber.Instance = null;
 
-                this.idQueue.Enqueue(id);
+                if (fiber.HasTask())
+                {
+                    this.idQueue.Enqueue(fiberId);
+                    this.idDict.TryAdd(fiberId, fiberId);
+                }
             }
         }
 
@@ -78,13 +83,19 @@ namespace ET
         {
             foreach (Thread thread in this.threads)
             {
+                this.workEvent.Set();
                 thread.Join();
             }
         }
 
         public void Add(int fiberId)
         {
-            this.idQueue.Enqueue(fiberId);
+            if (!this.idDict.ContainsKey(fiberId))
+            {
+                this.idQueue.Enqueue(fiberId);
+                this.idDict.TryAdd(fiberId, fiberId);
+                this.workEvent.Set(); // 唤醒线程  
+            }
         }
     }
 }

@@ -8,7 +8,7 @@ namespace ET
     // 一个Fiber一个固定的线程
     internal class ThreadScheduler: IScheduler
     {
-        private readonly ConcurrentDictionary<int, Thread> dictionary = new();
+        private readonly ConcurrentDictionary<int, Thread> dict = new();
         
         private readonly FiberManager fiberManager;
 
@@ -33,13 +33,12 @@ namespace ET
                 fiber = fiberManager.Get(fiberId);
                 if (fiber == null)
                 {
-                    this.dictionary.Remove(fiberId, out _);
+                    this.dict.TryRemove(fiberId, out _);
                     return;
                 }
-                
                 if (fiber.IsDisposed)
                 {
-                    this.dictionary.Remove(fiberId, out _);
+                    this.dict.TryRemove(fiberId, out _);
                     return;
                 }
                 
@@ -52,7 +51,7 @@ namespace ET
 
         public void Dispose()
         {
-            foreach (var kv in this.dictionary.ToArray())
+            foreach (var kv in this.dict.ToArray())
             {
                 kv.Value.Join();
             }
@@ -60,8 +59,13 @@ namespace ET
 
         public void Add(int fiberId)
         {
+            if (this.dict.ContainsKey(fiberId))
+            {
+                Log.Warning($"ThreadScheduler.Add repeated fiberId={fiberId}");
+                return;
+            }
             Thread thread = new(() => this.Loop(fiberId));
-            this.dictionary.TryAdd(fiberId, thread);
+            this.dict.TryAdd(fiberId, thread);
             thread.Start();
         }
     }

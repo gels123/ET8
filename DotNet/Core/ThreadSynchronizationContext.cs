@@ -6,10 +6,16 @@ namespace ET
 {
     public class ThreadSynchronizationContext : SynchronizationContext
     {
+        private Fiber fiber = null;
         // 线程同步队列,发送接收socket回调都放到该队列,由poll线程统一执行
         private readonly ConcurrentQueue<Action> queue = new();
 
         private Action a;
+
+        internal ThreadSynchronizationContext(Fiber fiber = null)
+        {
+            this.fiber = fiber;
+        }
 
         public void Update()
         {
@@ -29,6 +35,11 @@ namespace ET
                 }
             }
         }
+        
+        public bool HasTask()
+        {
+            return this.queue.Count > 0;
+        }
 
         public override void Post(SendOrPostCallback callback, object state)
         {
@@ -38,6 +49,11 @@ namespace ET
         public void Post(Action action)
         {
             this.queue.Enqueue(action);
+            
+            if (this.fiber != null)
+            {
+                this.fiber.scheduler.Add(this.fiber.Id); 
+            }
         }
     }
 }

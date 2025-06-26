@@ -31,17 +31,13 @@ namespace ET
             int count = this.idQueue.Count;
             while (count-- > 0)
             {
-                if (!this.idQueue.TryDequeue(out int id))
+                if (!this.idQueue.TryDequeue(out int fiberId))
                 {
                     continue;
                 }
 
-                Fiber fiber = this.fiberManager.Get(id);
-                if (fiber == null)
-                {
-                    continue;
-                }
-                if (fiber.IsDisposed)
+                Fiber fiber = this.fiberManager.Get(fiberId);
+                if (fiber == null || fiber.IsDisposed)
                 {
                     continue;
                 }
@@ -51,7 +47,7 @@ namespace ET
                 fiber.Update();
                 Fiber.Instance = null;
                 
-                this.idQueue.Enqueue(id);
+                this.idQueue.Enqueue(fiberId);
             }
             
             // Fiber调度完成，要还原成默认的上下文，否则unity的回调会找不到正确的上下文
@@ -63,17 +59,13 @@ namespace ET
             int count = this.idQueue.Count;
             while (count-- > 0)
             {
-                if (!this.idQueue.TryDequeue(out int id))
+                if (!this.idQueue.TryDequeue(out int fiberId))
                 {
                     continue;
                 }
 
-                Fiber fiber = this.fiberManager.Get(id);
-                if (fiber == null)
-                {
-                    continue;
-                }
-                if (fiber.IsDisposed)
+                Fiber fiber = this.fiberManager.Get(fiberId);
+                if (fiber == null || fiber.IsDisposed)
                 {
                     continue;
                 }
@@ -83,13 +75,13 @@ namespace ET
                 fiber.LateUpdate();
                 Fiber.Instance = null;
                 
-                this.idQueue.Enqueue(id);
+                this.idQueue.Enqueue(fiberId);
             }
 
             while (this.addIds.Count > 0)
             {
-                this.addIds.TryDequeue(out int result);
-                this.idQueue.Enqueue(result);
+                this.addIds.TryDequeue(out int fiberId);
+                this.idQueue.Enqueue(fiberId);
             }
             
             // Fiber调度完成，要还原成默认的上下文，否则unity的回调会找不到正确的上下文
