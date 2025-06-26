@@ -92,6 +92,7 @@ namespace ET
             }
 
             using ListComponent<ETTask> list = ListComponent<ETTask>.Create();
+            list.Clear();
             
             foreach (EventInfo eventInfo in iEvents)
             {

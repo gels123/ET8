@@ -83,7 +83,6 @@ namespace ET
                 {
                     throw new Exception($"entity system update fail: {component.GetType().FullName}", e);
                 }
-
             }
         }
 
